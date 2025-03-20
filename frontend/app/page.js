@@ -35,7 +35,8 @@ const Home = () => {
           </p>
           <div className="flex gap-4 justify-center">
             <button className="inline-flex items-center px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors">
-              <Link to="/loginRegister">Get Started</Link>
+              <Link to="/loginRegister">Get arted</Link>
+              
 
               <ArrowRight className="ml-2 h-5 w-5" />
                           

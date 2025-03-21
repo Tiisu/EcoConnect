@@ -35,8 +35,7 @@ const Home = () => {
           </p>
           <div className="flex gap-4 justify-center">
             <button className="inline-flex items-center px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors">
-              <Link to="/loginRegister">Get arted</Link>
-              
+              <a href="/loginRegister">Get Started</a>
 
               <ArrowRight className="ml-2 h-5 w-5" />
                           
@@ -104,7 +103,7 @@ const Home = () => {
           Join our platform today and start contributing to a cleaner, more sustainable future while earning rewards.
         </p>
         <button className="inline-flex items-center px-8 py-4 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors">
-          <Link to="/loginRegister">Start Recycling Now</Link>
+          <a href="/loginRegister">Start Recycling Now</a>
           <ArrowRight className="ml-2 h-5 w-5" />
         </button>
       </section>

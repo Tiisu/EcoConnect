@@ -1,8 +1,19 @@
+"use client"
+
 import React from 'react';
-import { ArrowRight, Link, Recycle, Trophy, Users } from 'lucide-react';
+import { ArrowRight,Recycle, Trophy, Users } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+import Link from 'next/link';
+import ConnectWallet from '@/components/shared/ConnectWallet';
+import { useRouter } from 'next/navigation';
 
 const Home = () => {
+  const router = useRouter();
+
+  const handleConnectSuccess = () => {
+    router.push('/dashboard');
+  };
+
   const features = [
     {
       icon: <Recycle className="h-12 w-12 text-green-600" />,
@@ -34,18 +45,13 @@ const Home = () => {
             Make an impact while earning rewards for your recycling efforts.
           </p>
           <div className="flex gap-4 justify-center">
-            <button className="inline-flex items-center px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors">
-              <a href="/loginRegister">Get Started</a>
-
-              <ArrowRight className="ml-2 h-5 w-5" />
-                          
-            </button>
-            <button className="px-6 py-3 text-green-600 border-2 border-green-600 font-semibold rounded-lg hover:bg-green-50 transition-colors">
+            <ConnectWallet 
+              onSuccess={handleConnectSuccess}
+              className="inline-flex items-center px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors"
+            />
+            <Button variant="outline" className="text-green-600 border-2 border-green-600">
               Learn More
-            </button>
-            
-
-            
+            </Button>
           </div>
         </div>
       </section>
@@ -103,7 +109,7 @@ const Home = () => {
           Join our platform today and start contributing to a cleaner, more sustainable future while earning rewards.
         </p>
         <button className="inline-flex items-center px-8 py-4 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors">
-          <a href="/loginRegister">Start Recycling Now</a>
+          <Link href="/loginRegister">Start Recycling Now</Link>
           <ArrowRight className="ml-2 h-5 w-5" />
         </button>
       </section>

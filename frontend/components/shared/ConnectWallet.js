@@ -1,26 +1,48 @@
 'use client';
 
-import { useWeb3 } from '@/context/Web3Context';
+import { useContext } from 'react';
+import { Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { EcoConnectContext } from '@/context/EcoConnect';
 
-export default function ConnectWallet() {
-  const { account, connectWallet, loading } = useWeb3();
+export default function ConnectWallet({ onSuccess, className }) {
+  const { connectWallet, currentAccount, loading } = useContext(EcoConnectContext);
 
-  if (loading) return <div>Loading...</div>;
+  const handleConnect = async () => {
+    try {
+      await connectWallet();
+      if (onSuccess) onSuccess();
+    } catch (error) {
+      console.error('Failed to connect wallet:', error);
+    }
+  };
+
+  if (currentAccount) {
+    return (
+      <Button
+        variant="outline"
+        className={className}
+        disabled
+      >
+        {`${currentAccount.slice(0, 6)}...${currentAccount.slice(-4)}`}
+      </Button>
+    );
+  }
 
   return (
-    <div className="text-center">
-      {!account ? (
-        <button
-          onClick={connectWallet}
-          className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700"
-        >
-          Connect Wallet
-        </button>
+    <Button
+      onClick={handleConnect}
+      disabled={loading}
+      className={className}
+    >
+      {loading ? (
+        <>
+          <Loader2 className="animate-spin" />
+          Connecting...
+        </>
       ) : (
-        <div className="text-gray-600">
-          Connected: {account.slice(0, 6)}...{account.slice(-4)}
-        </div>
+        'Connect Wallet'
       )}
-    </div>
+    </Button>
   );
 }

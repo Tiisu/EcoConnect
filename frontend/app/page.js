@@ -6,12 +6,13 @@ import { Card, CardContent } from '@/components/ui/card';
 import Link from 'next/link';
 import ConnectWallet from '@/components/shared/ConnectWallet';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 
 const Home = () => {
   const router = useRouter();
 
   const handleConnectSuccess = () => {
-    router.push('/dashboard');
+    router.push('/userDashboard');
   };
 
   const features = [

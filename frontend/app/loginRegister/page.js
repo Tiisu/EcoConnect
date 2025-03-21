@@ -1,23 +1,34 @@
 "use client"
 
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { AlertCircle, Loader2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { EcoConnectContext } from '../../context/EcoConnect';
 import { useRouter } from 'next/navigation';
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 const Register = () => {
-  const { contract, currentAccount } = useContext(EcoConnectContext);
   const router = useRouter();
   
   const [formData, setFormData] = useState({
-    name: '',
-    location: ''
+    username: '',
+    email: '',
+    password: '',
+    userType: 'regular' // 'regular' or 'agent'
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,21 +36,26 @@ const Register = () => {
     setError('');
     
     try {
-      if (!contract) throw new Error("Contract not initialized");
-      if (!currentAccount) throw new Error("Please connect your wallet first");
+      // Here you would typically make an API call to your backend
+      // to store user credentials and type
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
 
-      // Call the smart contract's registerUser function
-      const tx = await contract.registerUser();
-      
-      // Wait for the transaction to be mined
-      await tx.wait();
-      
-      // Store additional user data (could be done in a separate backend)
-      // This is optional since the smart contract doesn't store this info
-      
+      if (!response.ok) {
+        throw new Error('Registration failed');
+      }
+
       setSuccess(true);
+      // Store user type in localStorage for later use
+      localStorage.setItem('userType', formData.userType);
+      
       setTimeout(() => {
-        router.push('/dashboard');
+        router.push('/loginRegister?tab=login');
       }, 2000);
       
     } catch (error) {
@@ -50,8 +66,8 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white pt-24 pb-16">
-      <div className="container mx-auto px-4">
+    <div className="min-h-screen bg-background pt-24 pb-16">
+      <div className="container">
         <Card className="max-w-md mx-auto">
           <CardHeader>
             <CardTitle className="text-2xl text-center">Register Account</CardTitle>
@@ -65,54 +81,82 @@ const Register = () => {
             )}
             
             {success && (
-              <Alert className="mb-4 bg-green-50 text-green-600 border-green-200">
+              <Alert className="mb-4">
                 <AlertDescription>
-                  Registration successful! Redirecting to dashboard...
+                  Registration successful! Redirecting to login...
                 </AlertDescription>
               </Alert>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Full Name
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Username
                 </label>
-                <input
+                <Input
                   type="text"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Location
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Email
                 </label>
-                <input
-                  type="text"
+                <Input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                  value={formData.location}
-                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                 />
               </div>
 
-              <button
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Password
+                </label>
+                <Input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  User Type
+                </label>
+                <Select name="userType" value={formData.userType} onValueChange={(value) => handleChange({ target: { name: 'userType', value }})}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select user type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="regular">Regular User</SelectItem>
+                    <SelectItem value="agent">Agent</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <Button
                 type="submit"
-                disabled={loading || !currentAccount}
-                className="w-full py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full"
+                disabled={loading}
               >
                 {loading ? (
                   <span className="flex items-center justify-center">
-                    <Loader2 className="animate-spin mr-2 h-5 w-5" />
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Registering...
                   </span>
                 ) : (
                   "Register"
                 )}
-              </button>
+              </Button>
             </form>
           </CardContent>
         </Card>
@@ -127,34 +171,74 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Check if already connected and registered
+  useEffect(() => {
+    const checkUserStatus = async () => {
+      if (contract && currentAccount) {
+        try {
+          const userType = localStorage.getItem('userType');
+          const userDetails = await contract.getUserDetails(currentAccount);
+          
+          if (userDetails.isRegistered) {
+            router.push(userType === 'agent' ? '/agentDashboard' : '/userDashboard');
+          }
+        } catch (error) {
+          console.error('Error checking user status:', error);
+        }
+      }
+    };
+
+    checkUserStatus();
+  }, [currentAccount, contract, router]);
+
   const handleLogin = async () => {
+    if (loading) return;
+    
     setLoading(true);
     setError('');
 
     try {
+      // First ensure wallet is connected
       await connectWallet();
       
-      // Check if user is registered
-      if (contract && currentAccount) {
-        const userDetails = await contract.getUserDetails(currentAccount);
-        
-        if (userDetails.isRegistered) {
-          router.push('/dashboard');
-        } else {
-          router.push('/auth?page=register');
-        }
+      if (!contract || !currentAccount) {
+        throw new Error('Wallet connection failed');
       }
+
+      const userType = localStorage.getItem('userType');
+      if (!userType) {
+        throw new Error('Please select your user type first');
+      }
+
+      // Check if user is registered
+      const userDetails = await contract.getUserDetails(currentAccount);
       
+      if (userDetails.isRegistered) {
+        // If registered, redirect to appropriate dashboard
+        router.push(userType === 'agent' ? '/agentDashboard' : '/userDashboard');
+      } else {
+        // If not registered, register the user
+        const tx = userType === 'agent' 
+          ? await contract.registerAgent()
+          : await contract.registerUser();
+        
+        // Wait for transaction to be mined
+        await tx.wait();
+        
+        // After successful registration, redirect
+        router.push(userType === 'agent' ? '/agentDashboard' : '/userDashboard');
+      }
     } catch (error) {
-      setError(error.message || "Failed to connect wallet. Please try again.");
+      console.error('Login error:', error);
+      setError(error.message || 'Failed to connect wallet. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white pt-24 pb-16">
-      <div className="container mx-auto px-4">
+    <div className="min-h-screen bg-background pt-24 pb-16">
+      <div className="container">
         <Card className="max-w-md mx-auto">
           <CardHeader>
             <CardTitle className="text-2xl text-center">Connect Wallet</CardTitle>
@@ -168,23 +252,23 @@ const Login = () => {
             )}
 
             <p className="text-gray-600 mb-6 text-center">
-              Connect your wallet to access your account. New users will be redirected to registration.
+              Connect your wallet to complete the registration process and access your account.
             </p>
 
-            <button
+            <Button
               onClick={handleLogin}
+              className="w-full"
               disabled={loading}
-              className="w-full py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <span className="flex items-center justify-center">
-                  <Loader2 className="animate-spin mr-2 h-5 w-5" />
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Connecting...
                 </span>
               ) : (
                 "Connect Wallet"
               )}
-            </button>
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -193,14 +277,39 @@ const Login = () => {
 };
 
 export default function AuthPages() {
-  const [currentPage, setCurrentPage] = useState('login');
-  const { currentAccount } = useContext(EcoConnectContext);
+  const [currentPage, setCurrentPage] = useState('register');
+  const router = useRouter();
+
+  useEffect(() => {
+    // Check URL parameters for tab
+    const urlParams = new URLSearchParams(window.location.search);
+    const tab = urlParams.get('tab');
+    if (tab) {
+      setCurrentPage(tab);
+    }
+  }, []);
 
   return (
     <div>
       <div className="flex justify-center space-x-4 mb-8">
         <button
-          onClick={() => setCurrentPage('login')}
+          onClick={() => {
+            setCurrentPage('register');
+            router.push('/loginRegister?tab=register');
+          }}
+          className={`px-4 py-2 rounded-lg ${
+            currentPage === 'register'
+              ? 'bg-green-600 text-white'
+              : 'bg-gray-100 text-gray-600'
+          }`}
+        >
+          Register
+        </button>
+        <button
+          onClick={() => {
+            setCurrentPage('login');
+            router.push('/loginRegister?tab=login');
+          }}
           className={`px-4 py-2 rounded-lg ${
             currentPage === 'login'
               ? 'bg-green-600 text-white'
@@ -208,17 +317,6 @@ export default function AuthPages() {
           }`}
         >
           Login
-        </button>
-        <button
-          onClick={() => setCurrentPage('register')}
-          disabled={!currentAccount}
-          className={`px-4 py-2 rounded-lg ${
-            currentPage === 'register'
-              ? 'bg-green-600 text-white'
-              : 'bg-gray-100 text-gray-600'
-          } ${!currentAccount ? 'opacity-50 cursor-not-allowed' : ''}`}
-        >
-          Register
         </button>
       </div>
       {currentPage === 'login' ? <Login /> : <Register />}

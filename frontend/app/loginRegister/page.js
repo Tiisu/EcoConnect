@@ -55,7 +55,8 @@ const Register = () => {
       localStorage.setItem('userType', formData.userType);
       
       setTimeout(() => {
-        router.push('/loginRegister?tab=login');
+        const userType = localStorage.getItem('userType');
+        router.push(userType === 'agent' ? '/agentDashboard' : '/userDashboard');
       }, 2000);
       
     } catch (error) {
@@ -83,7 +84,7 @@ const Register = () => {
             {success && (
               <Alert className="mb-4">
                 <AlertDescription>
-                  Registration successful! Redirecting to login...
+                  Registration successful!  
                 </AlertDescription>
               </Alert>
             )}

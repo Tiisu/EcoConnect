@@ -12,14 +12,14 @@ export default function AgentDashboard() {
   const [pendingCollections, setPendingCollections] = useState([]);
   const [recentVerifications, setRecentVerifications] = useState([]);
   const [stats, setStats] = useState({
-    totalVerified: 0,
-    totalWasteCollected: 0,
-    totalPointsAwarded: 0,
+    totalVerified: 25,
+    totalWasteCollected: 45,
+    totalPointsAwarded: 400,
   });
 
   const POINT_SYSTEM_ADDRESS = process.env.NEXT_PUBLIC_POINT_SYSTEM_ADDRESS;
   const WASTE_COLLECTION_ADDRESS = process.env.NEXT_PUBLIC_WASTE_COLLECTION_ADDRESS;
-  const DEFAULT_AGENT_ADDRESS = '0xb15B9c3F2083E6318ce3E54499e165859B0db755';
+  const DEFAULT_AGENT_ADDRESS = '0x009188c8eeC3d184735650CdeaF4A145C5FdfB44';
 
   async function connectWallet() {
     if (window.ethereum) {

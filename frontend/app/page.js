@@ -12,7 +12,7 @@ const Home = () => {
   const router = useRouter();
 
   const handleConnectSuccess = () => {
-    router.push('/userDashboard');
+    router.push('/loginRegister');
   };
 
   const features = [
